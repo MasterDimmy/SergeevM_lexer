@@ -86,19 +86,20 @@ print progress
 last_h1_page = title_array[0].page
 #print "searching: "+title_array[0].title
 
-def replaceHeader(html, header, h):
-	fheader = re.finditer(r"<[\s]*[pP].*?"+re.escape(header)+r"[\s\S]*?<[\s]*/[\s]*[pP][\s]*>", html, re.UNICODE)
+def replaceHeader(html, header, page, h):
+	print "page = "+str(page)
+	fheader = re.finditer(r"<[\s]*div[\s]*id[\s]*=[\s]*\"page_"+str(page)+r"\"[\s]*>[\s\S]*?(<[\s]*[pP].*?"+re.escape(header)+r"[\s\S]*?<[\s]*/[\s]*[pP][\s]*>)", html,re.UNICODE | re.IGNORECASE)
 	for m in fheader:
-		#print "got start: "+str(m.start(0))+" end: "+str(m.end(0))
-		str = html[m.start(0) : m.end(0)]
-		#print str
-		new_str = re.sub(r"<[\s]*/[\s]*[pP][\s]*>$", "</"+h+">", str)  #end
+		#print "header: "+str(m.start(0))+" end: "+str(m.end(0))
+		st = html[m.start(1) : m.end(1)]
+		print st
+		new_str = re.sub(r"<[\s]*/[\s]*[pP][\s]*>$", "</"+h+">", st)  #end
 		new_str = re.sub(r"<[\s]*[pP]", "<"+h, new_str)  #first
-		#print new_str	
-		return re.sub(re.escape(str),new_str,html)
+		print new_str	
+		return re.sub(re.escape(st),new_str,html)
 	return html 
 
-html2 = replaceHeader(html, title_array[0].title, "h1")
+html2 = replaceHeader(html, title_array[0].title, title_array[0].page, "h1")
 
 progress = "PARSING HTML... 1%"
 ctypes.windll.kernel32.SetConsoleTitleA(progress)
@@ -114,15 +115,15 @@ for titles in title_array[1:]:
 	
 	if titles.marked == 1:
 		if last_h1_page==titles.page:
-			html2 = replaceHeader(html2, titles.title, "h2")	# [RULE4]
+			html2 = replaceHeader(html2, titles.title, titles.page, "h2")	# [RULE4]
 		if last_h1_page<>titles.page:
-			html2 = replaceHeader(html2, titles.title, "h1")	# [RULE5]
+			html2 = replaceHeader(html2, titles.title, titles.page, "h1")	# [RULE5]
 			last_h1_page = titles.page
 	if titles.marked == 0:
 		if titles.page-last_h1_page<3:
-			html2 = replaceHeader(html2, titles.title, "h2")	# [RULE6]
+			html2 = replaceHeader(html2, titles.title, titles.page, "h2")	# [RULE6]
 		else:
-			html2 = replaceHeader(html2, titles.title, "h1")	# [RULE7]
+			html2 = replaceHeader(html2, titles.title, titles.page, "h1")	# [RULE7]
 			last_h1_page = titles.page
 	
 fnew = open(sys.argv[1]+".new.html", "wb")
