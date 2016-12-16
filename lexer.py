@@ -87,7 +87,7 @@ last_h1_page = title_array[0].page
 #print "searching: "+title_array[0].title
 
 def replaceHeader(html, header, page, h):
-	print "page = "+str(page)
+	print "page = "+str(page)  # [RULE8]
 	fheader = re.finditer(r"<[\s]*div[\s]*id[\s]*=[\s]*\"page_"+str(page)+r"\"[\s]*>[\s\S]*?(<[\s]*[pP].*?"+re.escape(header)+r"[\s\S]*?<[\s]*/[\s]*[pP][\s]*>)", html,re.UNICODE | re.IGNORECASE)
 	for m in fheader:
 		#print "header: "+str(m.start(0))+" end: "+str(m.end(0))
